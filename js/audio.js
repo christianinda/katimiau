@@ -1,7 +1,9 @@
 const KatiAudio = (function(){
   let ctx = null;
+  let enabled = true;
 
   function getCtx(){
+    if(!enabled) return null;
     if(!ctx){
       const AC = window.AudioContext || window.webkitAudioContext;
       if(AC) ctx = new AC();
@@ -11,6 +13,12 @@ const KatiAudio = (function(){
   }
 
   function unlock(){ getCtx(); }
+
+  function isEnabled(){ return enabled; }
+  function setEnabled(next){
+    enabled = next;
+    if(!enabled) stopSpeak();
+  }
 
   function tone(freq, start, dur, { type = 'sine', peak = 0.18, glideTo = null } = {}){
     const c = getCtx();
@@ -92,41 +100,6 @@ const KatiAudio = (function(){
     }
   };
 
-  let ambientNodes = null;
-  function startAmbient(){
-    const c = getCtx();
-    if(!c || ambientNodes) return;
-    const master = c.createGain();
-    master.gain.setValueAtTime(0, c.currentTime);
-    master.gain.linearRampToValueAtTime(0.05, c.currentTime + 1.5);
-    master.connect(c.destination);
-
-    const oscA = c.createOscillator();
-    oscA.type = 'sine'; oscA.frequency.value = 196;
-    const oscB = c.createOscillator();
-    oscB.type = 'sine'; oscB.frequency.value = 246.94;
-    const lfo = c.createOscillator();
-    lfo.type = 'sine'; lfo.frequency.value = 0.12;
-    const lfoGain = c.createGain();
-    lfoGain.gain.value = 0.025;
-    lfo.connect(lfoGain);
-    lfoGain.connect(master.gain);
-
-    oscA.connect(master); oscB.connect(master);
-    oscA.start(); oscB.start(); lfo.start();
-    ambientNodes = { master, oscA, oscB, lfo };
-  }
-  function stopAmbient(){
-    if(!ambientNodes) return;
-    const c = getCtx();
-    const { master, oscA, oscB, lfo } = ambientNodes;
-    master.gain.linearRampToValueAtTime(0, c.currentTime + 0.6);
-    setTimeout(()=>{
-      try{ oscA.stop(); oscB.stop(); lfo.stop(); }catch(e){}
-    }, 700);
-    ambientNodes = null;
-  }
-
   let voices = [];
   function loadVoices(){ voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
   if(window.speechSynthesis){
@@ -142,12 +115,12 @@ const KatiAudio = (function(){
   }
 
   function speakBrowser(text, lang){
-    if(!window.speechSynthesis) return;
+    if(!enabled || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utter = new SpeechSynthesisUtterance(text);
     utter.lang = lang === 'en' ? 'en-US' : 'es-ES';
     utter.pitch = 1.3;
-    utter.rate = 0.92;
+    utter.rate = 0.82;
     const v = pickVoice(lang);
     if(v) utter.voice = v;
     window.speechSynthesis.speak(utter);
@@ -158,6 +131,10 @@ const KatiAudio = (function(){
 
   async function speak(text, lang, { onEnd } = {}){
     stopSpeak();
+    if(!enabled){
+      if(onEnd) onEnd();
+      return;
+    }
     try{
       const resp = await fetch(VOICE_API_URL, {
         method: 'POST',
@@ -166,15 +143,16 @@ const KatiAudio = (function(){
       });
       if(!resp.ok) throw new Error('voice_api_error_' + resp.status);
       const blob = await resp.blob();
+      if(!enabled){ if(onEnd) onEnd(); return; }
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       currentAudio = audio;
-      audio.addEventListener('ended', () => { URL.revokeObjectURL(url); if(onEnd) onEnd(); });
-      audio.addEventListener('error', () => { URL.revokeObjectURL(url); speakBrowser(text, lang); if(onEnd) onEnd(); });
+      audio.addEventListener('ended', () => { URL.revokeObjectURL(url); currentAudio = null; if(onEnd) onEnd(); });
+      audio.addEventListener('error', () => { URL.revokeObjectURL(url); currentAudio = null; speakBrowser(text, lang); if(onEnd) onEnd(); });
       await audio.play();
     }catch(e){
       speakBrowser(text, lang);
-      if(onEnd) setTimeout(onEnd, Math.max(2000, text.length * 60));
+      if(onEnd) setTimeout(onEnd, Math.max(2000, text.length * 70));
     }
   }
 
@@ -183,5 +161,5 @@ const KatiAudio = (function(){
     if(window.speechSynthesis) window.speechSynthesis.cancel();
   }
 
-  return { unlock, sfx, startAmbient, stopAmbient, speak, stopSpeak };
+  return { unlock, isEnabled, setEnabled, sfx, speak, stopSpeak };
 })();

@@ -5,6 +5,7 @@ const DEFAULT_STATE = {
   outfitClothing: 'none',
   outfitShoes: 'none',
   language: 'es',
+  soundEnabled: true,
   hearts: 0,
   coloring: {}
 };

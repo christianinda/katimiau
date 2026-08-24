@@ -58,6 +58,20 @@ function initNavigation(){
     applyI18n();
     refreshCurrentScreen();
   });
+
+  document.getElementById('sound-toggle').addEventListener('click', ()=>{
+    const next = !State.get().soundEnabled;
+    State.set({ soundEnabled: next });
+    applySoundToggle();
+  });
+}
+
+function applySoundToggle(){
+  const on = State.get().soundEnabled !== false;
+  KatiAudio.setEnabled(on);
+  const btn = document.getElementById('sound-toggle');
+  btn.textContent = on ? '🔊' : '🔇';
+  btn.setAttribute('aria-label', t(on ? 'nav.soundOn' : 'nav.soundOff'));
 }
 
 function refreshCurrentScreen(){
@@ -74,6 +88,7 @@ function refreshCurrentScreen(){
 function init(){
   applyI18n();
   document.getElementById('hearts-value').textContent = State.get().hearts || 0;
+  applySoundToggle();
   initNavigation();
   initModalCloseHandlers();
   goHome();

@@ -63,6 +63,10 @@ h1,h2,.brand{font-family:'Baloo 2', sans-serif;}
   gap:4px;
 }
 .icon-btn:active{transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,0.08);}
+.header-right{display:flex; align-items:center; gap:8px;}
+
+button:disabled{opacity:0.55; cursor:default;}
+button:disabled:active{transform:none; box-shadow:var(--shadow);}
 #hearts-counter{
   background:var(--white);
   border-radius:20px;

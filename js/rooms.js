@@ -163,21 +163,27 @@ function openStoryModal({ titleText, bodyText }){
   document.getElementById('story-modal-text').textContent = bodyText;
   const modal = document.getElementById('story-modal');
   modal.classList.remove('hidden');
-  if(KatiAudio) KatiAudio.startAmbient();
 
   const listenBtn = document.getElementById('story-listen-btn');
   listenBtn.textContent = t('bedroom.listen');
+  listenBtn.disabled = false;
   listenBtn.onclick = ()=>{
+    if(listenBtn.disabled) return;
     const lang = State.get().language || 'es';
+    listenBtn.disabled = true;
     listenBtn.textContent = t('bedroom.listening');
     KatiAudio.speak(bodyText, lang, {
-      onEnd: ()=>{ listenBtn.textContent = t('bedroom.listen'); }
+      onEnd: ()=>{
+        listenBtn.disabled = false;
+        listenBtn.textContent = t('bedroom.listen');
+      }
     });
   };
 
   const sleepBtn = document.getElementById('story-sleep-btn');
   sleepBtn.onclick = ()=>{
     KatiAudio.stopSpeak();
+    listenBtn.disabled = false;
     modal.classList.add('hidden');
     openSleepOverlay();
   };
@@ -186,18 +192,16 @@ function openStoryModal({ titleText, bodyText }){
 function openSleepOverlay(){
   renderCat('sleep-cat-svg-wrap', currentCatOpts({ asleep:true }));
   bumpHearts();
-  if(KatiAudio) KatiAudio.startAmbient();
   document.getElementById('sleep-overlay').classList.remove('hidden');
 }
 
 function initModalCloseHandlers(){
   document.getElementById('story-modal-close').addEventListener('click', ()=>{
     KatiAudio.stopSpeak();
-    KatiAudio.stopAmbient();
+    document.getElementById('story-listen-btn').disabled = false;
     document.getElementById('story-modal').classList.add('hidden');
   });
   document.getElementById('wake-btn').addEventListener('click', ()=>{
-    KatiAudio.stopAmbient();
     document.getElementById('sleep-overlay').classList.add('hidden');
     renderBedroom();
   });

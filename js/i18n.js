@@ -2,6 +2,8 @@ const I18N = {
   es: {
     "nav.home": "Inicio",
     "nav.back": "Volver",
+    "nav.soundOn": "Silenciar",
+    "nav.soundOff": "Activar sonido",
     "select.title": "¡Elige tu gatito!",
     "house.title": "La casa de Katimiau",
     "house.changeCat": "Cambiar de gatito",
@@ -63,6 +65,8 @@ const I18N = {
   en: {
     "nav.home": "Home",
     "nav.back": "Back",
+    "nav.soundOn": "Mute",
+    "nav.soundOff": "Turn sound on",
     "select.title": "Choose your kitty!",
     "house.title": "Katimiau's House",
     "house.changeCat": "Change kitty",

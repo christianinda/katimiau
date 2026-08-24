@@ -72,7 +72,7 @@ export default {
     }
 
     const voiceId = lang === 'en' ? env.VOICE_ID_EN : env.VOICE_ID_ES;
-    const cacheKeyRaw = `${voiceId}:${lang}:${text}`;
+    const cacheKeyRaw = `v2:${voiceId}:${lang}:${text}`;
     const cacheHash = await sha256Hex(cacheKeyRaw);
     const cacheUrl = `https://katimiau-tts-cache.internal/${cacheHash}`;
     const cache = caches.default;
@@ -95,7 +95,7 @@ export default {
       body: JSON.stringify({
         text,
         model_id: env.MODEL_ID || 'eleven_multilingual_v2',
-        voice_settings: { stability: 0.55, similarity_boost: 0.8, style: 0.35, use_speaker_boost: true }
+        voice_settings: { stability: 0.55, similarity_boost: 0.8, style: 0.35, use_speaker_boost: true, speed: 0.85 }
       })
     });
 
