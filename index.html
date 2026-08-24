@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Katimiau</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐱</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <header id="app-header">
+    <button id="home-btn" class="icon-btn" data-i18n-aria="nav.home" aria-label="Inicio">🏠</button>
+    <div id="hearts-counter"><span id="hearts-icon">💗</span> <span id="hearts-value">0</span></div>
+    <button id="lang-toggle" class="icon-btn" aria-label="Cambiar idioma">🌐 <span id="lang-label">ES</span></button>
+  </header>
+
+  <!-- SCREEN: CAT SELECT -->
+  <section id="screen-select" class="screen">
+    <h1 class="title" data-i18n="select.title">¡Elige tu gatito!</h1>
+    <div id="cat-select-grid" class="cat-select-grid"></div>
+  </section>
+
+  <!-- SCREEN: HOUSE -->
+  <section id="screen-house" class="screen">
+    <div id="house-cat-preview" class="cat-preview">
+      <div id="house-cat-svg-wrap"></div>
+    </div>
+    <h1 class="title" data-i18n="house.title">La casa de Katimiau</h1>
+    <div class="rooms-grid">
+      <button class="room-card" data-room="bathroom">
+        <span class="room-emoji">🛁</span>
+        <span data-i18n="rooms.bathroom">Baño</span>
+      </button>
+      <button class="room-card" data-room="kitchen">
+        <span class="room-emoji">🍽️</span>
+        <span data-i18n="rooms.kitchen">Cocina</span>
+      </button>
+      <button class="room-card" data-room="bedroom">
+        <span class="room-emoji">🛏️</span>
+        <span data-i18n="rooms.bedroom">Dormitorio</span>
+      </button>
+      <button class="room-card" data-room="artroom">
+        <span class="room-emoji">🎨</span>
+        <span data-i18n="rooms.artroom">Taller de arte</span>
+      </button>
+    </div>
+    <button id="change-cat-btn" class="link-btn" data-i18n="house.changeCat">Cambiar de gatito</button>
+  </section>
+
+  <!-- SCREEN: BATHROOM -->
+  <section id="screen-bathroom" class="screen room-screen">
+    <button class="back-btn" data-back>← <span data-i18n="nav.back">Volver</span></button>
+    <h1 class="title" data-i18n="rooms.bathroom">Baño</h1>
+    <div class="room-cat-stage">
+      <div id="bathroom-cat-svg-wrap"></div>
+      <div id="bathroom-fx" class="fx-layer"></div>
+    </div>
+    <div class="action-grid" id="bathroom-actions"></div>
+  </section>
+
+  <!-- SCREEN: KITCHEN -->
+  <section id="screen-kitchen" class="screen room-screen">
+    <button class="back-btn" data-back>← <span data-i18n="nav.back">Volver</span></button>
+    <h1 class="title" data-i18n="rooms.kitchen">Cocina</h1>
+    <div class="room-cat-stage">
+      <div id="kitchen-cat-svg-wrap"></div>
+      <div id="kitchen-fx" class="fx-layer"></div>
+    </div>
+    <h2 class="subtitle" data-i18n="kitchen.food">Comida</h2>
+    <div class="action-grid" id="kitchen-food-actions"></div>
+    <h2 class="subtitle" data-i18n="kitchen.drink">Bebida</h2>
+    <div class="action-grid" id="kitchen-drink-actions"></div>
+  </section>
+
+  <!-- SCREEN: BEDROOM -->
+  <section id="screen-bedroom" class="screen room-screen">
+    <button class="back-btn" data-back>← <span data-i18n="nav.back">Volver</span></button>
+    <h1 class="title" data-i18n="rooms.bedroom">Dormitorio</h1>
+    <div class="room-cat-stage">
+      <div id="bedroom-cat-svg-wrap"></div>
+      <div id="bedroom-fx" class="fx-layer"></div>
+    </div>
+    <h2 class="subtitle" data-i18n="bedroom.outfits">Vestir a Katimiau</h2>
+    <div class="action-grid" id="bedroom-outfit-actions"></div>
+    <h2 class="subtitle" data-i18n="bedroom.stories">Cuento para dormir</h2>
+    <div class="action-grid" id="bedroom-story-actions"></div>
+  </section>
+
+  <!-- SCREEN: ART ROOM -->
+  <section id="screen-artroom" class="screen room-screen">
+    <button class="back-btn" data-back>← <span data-i18n="nav.back">Volver</span></button>
+    <h1 class="title" data-i18n="rooms.artroom">Taller de arte</h1>
+    <div id="art-template-picker" class="action-grid"></div>
+    <div id="art-canvas-wrap">
+      <div id="art-palette"></div>
+      <div id="art-svg-wrap"></div>
+      <button id="art-clear-btn" class="secondary-btn" data-i18n="art.clear">Limpiar dibujo</button>
+    </div>
+  </section>
+
+  <!-- STORY MODAL -->
+  <div id="story-modal" class="modal hidden">
+    <div class="modal-card">
+      <button id="story-modal-close" class="icon-btn" aria-label="Cerrar">✕</button>
+      <h2 id="story-modal-title"></h2>
+      <p id="story-modal-text"></p>
+      <button id="story-sleep-btn" class="primary-btn" data-i18n="bedroom.sleepNow">Dormir con este cuento 🌙</button>
+    </div>
+  </div>
+
+  <!-- SLEEP OVERLAY -->
+  <div id="sleep-overlay" class="modal hidden">
+    <div class="sleep-card">
+      <div id="sleep-cat-svg-wrap"></div>
+      <div class="zzz">💤</div>
+      <p data-i18n="bedroom.sleeping">Katimiau está durmiendo... 😴</p>
+      <button id="wake-btn" class="primary-btn" data-i18n="bedroom.wake">Despertar</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/i18n.js"></script>
+<script src="js/state.js"></script>
+<script src="js/cat.js"></script>
+<script src="js/data.js"></script>
+<script src="js/rooms.js"></script>
+<script src="js/art.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
