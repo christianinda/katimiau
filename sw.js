@@ -1,4 +1,4 @@
-const CACHE_NAME = 'katimiau-v1';
+const CACHE_NAME = 'katimiau-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -6,8 +6,9 @@ const APP_SHELL = [
   './css/style.css',
   './js/i18n.js',
   './js/state.js',
-  './js/cat.js',
+  './js/audio.js',
   './js/data.js',
+  './js/cat.js',
   './js/rooms.js',
   './js/art.js',
   './js/main.js',

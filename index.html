@@ -97,6 +97,7 @@
     <div class="action-grid" id="bedroom-outfit-actions"></div>
     <h2 class="subtitle" data-i18n="bedroom.stories">Cuento para dormir</h2>
     <div class="action-grid" id="bedroom-story-actions"></div>
+    <button id="bedroom-surprise-btn" class="secondary-btn surprise-btn">🎲 <span data-i18n="bedroom.surprise">Cuento sorpresa</span></button>
   </section>
 
   <!-- SCREEN: ART ROOM -->
@@ -117,7 +118,10 @@
       <button id="story-modal-close" class="icon-btn" aria-label="Cerrar">✕</button>
       <h2 id="story-modal-title"></h2>
       <p id="story-modal-text"></p>
-      <button id="story-sleep-btn" class="primary-btn" data-i18n="bedroom.sleepNow">Dormir con este cuento 🌙</button>
+      <div class="modal-actions">
+        <button id="story-listen-btn" class="secondary-btn" data-i18n="bedroom.listen">Escuchar cuento 🔊</button>
+        <button id="story-sleep-btn" class="primary-btn" data-i18n="bedroom.sleepNow">Dormir con este cuento 🌙</button>
+      </div>
     </div>
   </div>
 
@@ -135,8 +139,9 @@
 
 <script src="js/i18n.js"></script>
 <script src="js/state.js"></script>
-<script src="js/cat.js"></script>
+<script src="js/audio.js"></script>
 <script src="js/data.js"></script>
+<script src="js/cat.js"></script>
 <script src="js/rooms.js"></script>
 <script src="js/art.js"></script>
 <script src="js/main.js"></script>

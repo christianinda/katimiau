@@ -77,6 +77,12 @@ function init(){
   initNavigation();
   initModalCloseHandlers();
   goHome();
+
+  const unlockOnce = () => {
+    KatiAudio.unlock();
+    document.removeEventListener('pointerdown', unlockOnce);
+  };
+  document.addEventListener('pointerdown', unlockOnce);
 }
 
 document.addEventListener('DOMContentLoaded', init);

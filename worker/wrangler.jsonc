@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "katimiau-voice",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-01",
+  "observability": { "enabled": true },
+  "vars": {
+    "ALLOWED_ORIGIN": "https://christianinda.github.io",
+    "MAX_TEXT_LENGTH": "600",
+    "RATE_LIMIT_PER_HOUR": "15",
+    "VOICE_ID_ES": "cgSgspJ2msm6clMCkdW9",
+    "VOICE_ID_EN": "cgSgspJ2msm6clMCkdW9",
+    "MODEL_ID": "eleven_multilingual_v2"
+  },
+  "kv_namespaces": [
+    { "binding": "RATE_LIMIT", "id": "76e5456703534780a36bad110f997f32" }
+  ]
+}

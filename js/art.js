@@ -48,6 +48,7 @@ function renderArtCanvas(){
       e.stopPropagation();
       node.setAttribute('fill', currentArtColor);
       State.setColoringPart(currentArtTemplateId, part, currentArtColor);
+      if(KatiAudio) KatiAudio.sfx.paint();
       bumpHearts();
     });
   });

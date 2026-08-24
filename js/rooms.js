@@ -9,17 +9,43 @@ function popFx(layerId, emoji){
   setTimeout(()=>{ span.remove(); }, 1000);
 }
 
+function bubbleFx(layerId, text){
+  const layer = document.getElementById(layerId);
+  if(!layer) return;
+  const span = document.createElement('span');
+  span.className = 'fx-bubble';
+  span.textContent = text;
+  layer.appendChild(span);
+  setTimeout(()=>{ span.remove(); }, 1600);
+}
+
+function randomReaction(){
+  const lang = State.get().language || 'es';
+  const pool = BATHROOM_REACTIONS[lang] || BATHROOM_REACTIONS.es;
+  return pickRandom(pool);
+}
+
 function bumpHearts(){
   const val = State.addHeart();
   const el = document.getElementById('hearts-value');
   if(el) el.textContent = val;
+  if(KatiAudio) KatiAudio.sfx.heart();
+}
+
+function popBtn(btn){
+  btn.classList.remove('pop');
+  void btn.offsetWidth;
+  btn.classList.add('pop');
 }
 
 function buildActionButton({ emoji, label, onClick, selected }){
   const btn = document.createElement('button');
   btn.className = 'action-btn' + (selected ? ' selected' : '');
   btn.innerHTML = `<span class="a-emoji">${emoji}</span><span>${label}</span>`;
-  btn.addEventListener('click', onClick);
+  btn.addEventListener('click', ()=>{
+    popBtn(btn);
+    onClick();
+  });
   return btn;
 }
 
@@ -30,9 +56,11 @@ function renderBathroom(){
   BATHROOM_ACTIONS.forEach(a=>{
     grid.appendChild(buildActionButton({
       emoji:a.emoji,
-      label:t(a.labelKey),
+      label:biLabel(a.labelKey),
       onClick:()=>{
         popFx('bathroom-fx', a.fx);
+        if(KatiAudio && KatiAudio.sfx[a.sfx]) KatiAudio.sfx[a.sfx]();
+        setTimeout(()=> bubbleFx('bathroom-fx', randomReaction()), 250);
         bumpHearts();
       }
     }));
@@ -46,9 +74,20 @@ function renderKitchen(){
   KITCHEN_FOOD.forEach(f=>{
     foodGrid.appendChild(buildActionButton({
       emoji:f.emoji,
-      label:t(f.labelKey),
+      label:biLabel(f.labelKey),
       onClick:()=>{
-        popFx('kitchen-fx', f.fx);
+        popFx('kitchen-fx', '😋');
+        let chews = 0;
+        const chewTimer = setInterval(()=>{
+          if(KatiAudio) KatiAudio.sfx.chew();
+          chews++;
+          if(chews >= 3){
+            clearInterval(chewTimer);
+            const lang = State.get().language || 'es';
+            KatiAudio.speak(t('food.thanks'), lang);
+            bubbleFx('kitchen-fx', t('food.thanks'));
+          }
+        }, 260);
         bumpHearts();
       }
     }));
@@ -58,9 +97,10 @@ function renderKitchen(){
   KITCHEN_DRINK.forEach(d=>{
     drinkGrid.appendChild(buildActionButton({
       emoji:d.emoji,
-      label:t(d.labelKey),
+      label:biLabel(d.labelKey),
       onClick:()=>{
-        popFx('kitchen-fx', d.fx);
+        popFx('kitchen-fx', '😊');
+        if(KatiAudio) KatiAudio.sfx.drink();
         bumpHearts();
       }
     }));
@@ -76,10 +116,11 @@ function renderBedroom(){
   OUTFIT_CLOTHING.forEach(o=>{
     outfitGrid.appendChild(buildActionButton({
       emoji:'👕',
-      label:t(o.labelKey),
+      label:biLabel(o.labelKey),
       selected: s.outfitClothing === o.id,
       onClick:()=>{
         State.set({ outfitClothing:o.id });
+        if(KatiAudio) KatiAudio.sfx.dress();
         bumpHearts();
         renderBedroom();
       }
@@ -88,10 +129,11 @@ function renderBedroom(){
   OUTFIT_SHOES.forEach(o=>{
     outfitGrid.appendChild(buildActionButton({
       emoji:'👟',
-      label:t(o.labelKey),
+      label:biLabel(o.labelKey),
       selected: s.outfitShoes === o.id,
       onClick:()=>{
         State.set({ outfitShoes:o.id });
+        if(KatiAudio) KatiAudio.sfx.dress();
         bumpHearts();
         renderBedroom();
       }
@@ -104,18 +146,38 @@ function renderBedroom(){
     storyGrid.appendChild(buildActionButton({
       emoji:story.emoji,
       label:t(story.titleKey),
-      onClick:()=> openStoryModal(story)
+      onClick:()=> openStoryModal({ titleText:t(story.titleKey), bodyText:t(story.textKey) })
     }));
   });
+
+  const surpriseBtn = document.getElementById('bedroom-surprise-btn');
+  surpriseBtn.onclick = ()=>{
+    const lang = State.get().language || 'es';
+    const story = generateRandomStory(lang);
+    openStoryModal({ titleText: story.title, bodyText: story.text });
+  };
 }
 
-function openStoryModal(story){
-  document.getElementById('story-modal-title').textContent = t(story.titleKey);
-  document.getElementById('story-modal-text').textContent = t(story.textKey);
+function openStoryModal({ titleText, bodyText }){
+  document.getElementById('story-modal-title').textContent = titleText;
+  document.getElementById('story-modal-text').textContent = bodyText;
   const modal = document.getElementById('story-modal');
   modal.classList.remove('hidden');
+  if(KatiAudio) KatiAudio.startAmbient();
+
+  const listenBtn = document.getElementById('story-listen-btn');
+  listenBtn.textContent = t('bedroom.listen');
+  listenBtn.onclick = ()=>{
+    const lang = State.get().language || 'es';
+    listenBtn.textContent = t('bedroom.listening');
+    KatiAudio.speak(bodyText, lang, {
+      onEnd: ()=>{ listenBtn.textContent = t('bedroom.listen'); }
+    });
+  };
+
   const sleepBtn = document.getElementById('story-sleep-btn');
   sleepBtn.onclick = ()=>{
+    KatiAudio.stopSpeak();
     modal.classList.add('hidden');
     openSleepOverlay();
   };
@@ -124,14 +186,18 @@ function openStoryModal(story){
 function openSleepOverlay(){
   renderCat('sleep-cat-svg-wrap', currentCatOpts({ asleep:true }));
   bumpHearts();
+  if(KatiAudio) KatiAudio.startAmbient();
   document.getElementById('sleep-overlay').classList.remove('hidden');
 }
 
 function initModalCloseHandlers(){
   document.getElementById('story-modal-close').addEventListener('click', ()=>{
+    KatiAudio.stopSpeak();
+    KatiAudio.stopAmbient();
     document.getElementById('story-modal').classList.add('hidden');
   });
   document.getElementById('wake-btn').addEventListener('click', ()=>{
+    KatiAudio.stopAmbient();
     document.getElementById('sleep-overlay').classList.add('hidden');
     renderBedroom();
   });
