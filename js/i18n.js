@@ -25,7 +25,7 @@ const I18N = {
     "art.clear": "Limpiar dibujo",
     "cats.black": "Negro",
     "cats.white": "Blanco",
-    "cats.brown": "Cafesito",
+    "cats.brown": "Cafecito",
     "select.choose": "¡Este quiero!",
     "bathroom.pee": "Hacer pipí",
     "bathroom.poop": "Hacer caca",
